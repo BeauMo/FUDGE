@@ -1,3 +1,4 @@
+/// <reference path="../../Physics/ammo.d.ts" />
 declare namespace FudgeCore {
     /**
      * Base class for the different DebugTargets, mainly for technical purpose of inheritance
@@ -3340,6 +3341,83 @@ declare namespace FudgeCore {
         protected createVertices(): Float32Array;
         protected createTextureUVs(): Float32Array;
         protected createFaceNormals(): Float32Array;
+    }
+}
+declare namespace FudgeCore {
+    /**
+     * Initial test RB Class for Ammo, collider and such will be split later
+     */
+    class ComponentRigidbody extends Component {
+        static readonly iSubclass: number;
+        mass: number;
+        private ammoBody;
+        private ammoTransform;
+        constructor(_mass?: number, _node?: Node);
+        getRotation(): Vector3;
+        getPosition(): Vector3;
+        updateBody(): void;
+        getAmmoRigidbody(): Ammo.btRigidBody;
+        private addRigidbodyToWorld;
+        private removeRigidbodyFromWorld;
+        private createBody;
+    }
+}
+declare namespace FudgeCore {
+    /**
+      * Main Physics Class of the ammo.js integration. Holding information about the world an the bodies in it.
+      * @author Marko Fehrenbach, HFU 2020
+      */
+    class Physics {
+        static world: Physics;
+        isInitialized: boolean;
+        private ammoWorld;
+        static initializePhysics(fnc: any): any;
+        getAmmoWorld(): Ammo.btDiscreteDynamicsWorld;
+        protected setAmmoWorld(world: Ammo.btDiscreteDynamicsWorld): void;
+        static simulate(deltaTime?: number): void;
+    }
+}
+declare namespace FudgeCore {
+    /**
+      * Storing and manipulating rotations in the form of quaternions.
+      * Constructed out of the 4 components x,y,z,w. Commonly used to calculate rotations in physics engines.
+      * Class mostly used internally to bridge the in FUDGE commonly used angles in degree to OimoPhysics quaternion system.
+      * @authors Marko Fehrenbach, HFU, 2020
+      */
+    class Quaternion extends Mutable {
+        private x;
+        private y;
+        private z;
+        private w;
+        constructor(_x?: number, _y?: number, _z?: number, _w?: number);
+        /** Get/Set the X component of the Quaternion. Real Part */
+        get X(): number;
+        set X(_x: number);
+        /** Get/Set the Y component of the Quaternion. Real Part */
+        get Y(): number;
+        set Y(_y: number);
+        /** Get/Set the Z component of the Quaternion. Real Part */
+        get Z(): number;
+        set Z(_z: number);
+        /** Get/Set the Y component of the Quaternion. Imaginary Part */
+        get W(): number;
+        set W(_w: number);
+        /**
+         * Create quaternion from vector3 angles in degree
+         */
+        setFromVector3(rollX: number, pitchY: number, yawZ: number): void;
+        /**
+         * Returns the euler angles in radians as Vector3 from this quaternion.
+         */
+        toEulerAngles(): Vector3;
+        /**
+         * Return angles in degrees as vector3 from this. quaterion
+         */
+        toDegrees(): Vector3;
+        getMutator(): Mutator;
+        protected reduceMutator(_mutator: Mutator): void;
+        /** Copying the sign of a to b */
+        private copysign;
     }
 }
 declare namespace FudgeCore {

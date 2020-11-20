@@ -83,7 +83,24 @@ namespace FudgeCore {
       if (_node.getParent())
         matrix = _node.getParent().mtxWorld;
 
+
       RenderManager.setupTransformAndLights(_node, matrix);
+
+      // TODO: Physics real transfer of different kinds of body types back to fudge transform
+      if (Physics.world != null && Physics.world.isInitialized) {
+        let mutator: Mutator = {};
+        for (let name in _node.getChildren()) {
+          let childNode: Node = _node.getChildren()[name];
+          let cmpRigidbody: ComponentRigidbody = childNode.getComponent(ComponentRigidbody);
+          if (childNode.getComponent(ComponentTransform) != null && cmpRigidbody != null) {
+            cmpRigidbody.updateBody();
+            mutator["rotation"] = cmpRigidbody.getRotation();
+            mutator["translation"] = cmpRigidbody.getPosition();
+            childNode.mtxLocal.mutate(mutator);
+          }
+        }
+      }
+
 
       RenderManager.drawGraphRecursive(_node, _cmpCamera, _drawNode);
     }
@@ -200,7 +217,7 @@ namespace FudgeCore {
      */
     private static setupTransformAndLights(_node: Node, _world: Matrix4x4 = Matrix4x4.IDENTITY(), _lights: MapLightTypeToLightList = new Map(), _shadersUsed: (typeof Shader)[] = null): void {
       RenderManager.timestampUpdate = performance.now();
-      
+
       let firstLevel: boolean = (_shadersUsed == null);
       if (firstLevel)
         _shadersUsed = [];
